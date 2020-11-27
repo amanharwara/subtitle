@@ -1,15 +1,26 @@
 [package]
 name = "subtitle"
 description = "Find & download subtitles from the terminal."
-version = "0.1.0"
-authors = ["Aman <amanharwara@protonmail.com>"]
+version = "1.0.0"
+authors = ["Aman Harwara <amanharwara@protonmail.com>"]
 edition = "2018"
+homepage = "https://github.com/amanharwara/subtitle"
 repository = "https://github.com/amanharwara/subtitle"
+license = "GPL-3.0-or-later"
+keywords = ["subtitle", "subdb", "opensubtitles"]
+categories = ["command-line-utilities"]
+readme = "README.md"
+exclude = ["test_videos/*"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 seahorse = "1.1"
 md-5 = "0.9.1"
-reqwest = {version="0.10.8",features=["blocking"]}
+reqwest = { version = "0.10.8", features = ["blocking", "json"] }
 clap = "3.0.0-beta.2"
+directories = "3.0.1"
+thiserror = "1.0.22"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+dialoguer = "0.7.1"
