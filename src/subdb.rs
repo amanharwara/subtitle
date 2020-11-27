@@ -1,6 +1,64 @@
+use super::error::Result;
+use super::save_file;
+use clap::Values;
 use md5::{Digest, Md5};
 use reqwest::Url;
 use std::fs;
+use std::path::Path;
+
+pub fn use_subdb(files: Values, current_lang: &str, dont_use_lang_fallback: bool) -> Result<()> {
+    let files: Vec<&str> = files.collect();
+    if files.len() > 0 {
+        for file in files.iter() {
+            println!("\nGenerating hash for file {}", file);
+
+            let hash = hash(file);
+            println!("Hash generated: {}", hash);
+
+            let search = search(&*hash)?;
+            let languages: Vec<&str> = search.split(",").collect();
+
+            println!("\nAvailable Languages: {:?}", languages);
+
+            // Replace extension of file to .srt
+            let ext = Path::new(file).extension().unwrap().to_str().unwrap();
+            let filename = file.to_string().replace(ext, "srt");
+
+            let downloaded;
+
+            if languages.len() > 0 {
+                if languages.contains(&current_lang) {
+                    println!("\nSubtitle found in the currently selected language.");
+                    downloaded = download(&*hash, current_lang)?;
+                    match save_file(&downloaded, &filename) {
+                        Ok(_) => println!("File saved!"),
+                        Err(err) => {
+                            println!("\nError while saving file: {}", err);
+                        }
+                    }
+                } else {
+                    if languages.contains(&"en") && !dont_use_lang_fallback {
+                        println!("\nCould not find a subtitle in the selected language. Downloading the English subtitles.");
+                        downloaded = download(&*hash, "en")?;
+                        match save_file(&downloaded, &filename) {
+                            Ok(_) => println!("File saved!"),
+                            Err(err) => {
+                                println!("\nError while saving file: {}", err);
+                            }
+                        }
+                    } else {
+                        println!("\nCould not find a subtitle in the selected language. You can try again by changing the language using the --lang or -l flag.");
+                    }
+                }
+            } else {
+                println!("\nNo subtitle found for the given file.");
+                return Ok(());
+            }
+        }
+    }
+
+    Ok(())
+}
 
 pub fn search(hash: &str) -> Result<String, reqwest::Error> {
     let response;
