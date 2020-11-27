@@ -15,7 +15,6 @@ exclude = ["test_videos/*"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-seahorse = "1.1"
 md-5 = "0.9.1"
 reqwest = { version = "0.10.8", features = ["blocking", "json"] }
 clap = "3.0.0-beta.2"
