@@ -5,20 +5,20 @@ Find & download subtitles from the terminal.
 Usage:
 
 ```
-$ ./subtitle --help
-
-subtitle 0.1.0
+subtitle 1.0.0
 Find & download subtitles from the terminal.
 
 USAGE:
-    subtitle.exe [OPTIONS] [FILE]...
+    subtitle.exe [FLAGS] [OPTIONS] [FILE(S)]...
 
 ARGS:
-    <FILE>...    Get subtitles using a file.
+    <FILE(S)>...    Get subtitles for a file or multiple files.
 
 FLAGS:
-    -h, --help       Prints help information
-    -V, --version    Prints version information
+    -d, --dont-use-lang-fallback    When used, app will stop if subtitles aren't found for the
+                                    selected language.
+    -h, --help                      Prints help information
+    -V, --version                   Prints version information
 
 OPTIONS:
         --api <API_NAME>     The API to use for downloading subtitles. [default: subdb] [possible
