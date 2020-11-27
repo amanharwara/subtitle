@@ -2,6 +2,12 @@
 
 Find & download subtitles from the terminal.
 
+Installation:
+
+```
+cargo install subtitle
+```
+
 Usage:
 
 ```
