@@ -153,15 +153,19 @@ pub fn use_opensubs(files: clap::Values, lang: &str, token: &str) -> Result<()> 
                 .filter(|&subtitle| subtitle["attributes"]["language"] == lang)
                 .collect();
 
-            println!("\nFound subtitle. Downloading...");
-            let subtitle = filtered_results[0];
-            let file_id = subtitle["attributes"]["files"][0]["file_id"].to_string();
-            let link = get_subtitle_link(&file_id, token)?;
+            if filtered_results.len() > 0 {
+                println!("\nFound subtitle. Downloading...");
+                let subtitle = filtered_results[0];
+                let file_id = subtitle["attributes"]["files"][0]["file_id"].to_string();
+                let link = get_subtitle_link(&file_id, token)?;
 
-            let ext = Path::new(file).extension().unwrap().to_str().unwrap();
-            let fname = file.replace(ext, "srt");
+                let ext = Path::new(file).extension().unwrap().to_str().unwrap();
+                let fname = file.replace(ext, "srt");
 
-            download_subtitle(&link, &fname)?
+                download_subtitle(&link, &fname)?
+            } else {
+                println!("\nCould not find suitable subtitle.");
+            }
         }
     }
 
