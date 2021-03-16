@@ -7,19 +7,15 @@ use std::{fs, path::PathBuf};
 #[derive(Deserialize, Serialize, Debug)]
 #[serde(default)]
 pub struct Config {
-    pub api: String,
     pub lang: String,
     pub os_token: String,
-    pub dont_use_lang_fallback: bool,
 }
 
 impl Default for Config {
     fn default() -> Self {
         Config {
-            api: String::from("subdb"),
             lang: String::from("en"),
             os_token: String::from(""),
-            dont_use_lang_fallback: false,
         }
     }
 }
@@ -40,7 +36,7 @@ impl Config {
             Some(file) => serde_json::from_reader(file)
                 .map_err(|_| Error::MalformedFile(filename.clone()))
                 .and_then(|cfg: Config| {
-                    if cfg.api.len() == 0 || cfg.lang.len() == 0 {
+                    if cfg.lang.len() == 0 {
                         Err(Error::MalformedFile(filename))
                     } else {
                         Ok(cfg)

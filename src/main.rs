@@ -16,15 +16,6 @@ fn main() -> Result<()> {
                 .multiple(true),
         )
         .arg(
-            Arg::new("api")
-                .long("api")
-                .value_name("API_NAME")
-                .about("The API to use for downloading subtitles.")
-                .takes_value(true)
-                .possible_values(&["subdb", "opensubtitles"])
-                .default_value("subdb"),
-        )
-        .arg(
             Arg::new("lang")
                 .long("lang")
                 .short('l')
