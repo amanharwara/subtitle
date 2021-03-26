@@ -27,8 +27,9 @@ pub fn run(matches: ArgMatches) -> Result<()> {
             if os_token.len() > 0 {
                 use_opensubs(files, current_lang, os_token)?
             } else {
-                println!("\nNo OpenSubtitles token found.");
+                println!("No OpenSubtitles token found.");
                 authenticate_os_user()?;
+                use_opensubs(files, current_lang, os_token)?
             }
         }
         None => {
@@ -51,7 +52,7 @@ pub fn authenticate_os_user() -> Result<()> {
             .interact_text()?;
         config.set_os_token(token)?
     } else {
-        println!("\nYou can generate a token with your username & password.");
+        println!("You can generate a token with your username & password.");
         let username: String = Input::new().with_prompt("Username").interact_text()?;
         let password: String = Password::new().with_prompt("Password").interact()?;
         let token = get_os_token(&username, &password)?;
@@ -72,9 +73,6 @@ mod tests {
 
     #[test]
     fn test_hash_fn() {
-        assert_eq!(
-            &hash("./test_videos/opensubs/breakdance.avi").unwrap(),
-            "8e245d9679d31e12"
-        );
+        assert_eq!(&hash("./test/breakdance.avi").unwrap(), "8e245d9679d31e12");
     }
 }

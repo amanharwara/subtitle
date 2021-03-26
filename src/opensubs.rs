@@ -102,7 +102,7 @@ fn download_subtitle(link: &str, fname: &str) -> Result<()> {
 
     match save_file(&response, fname) {
         Ok(_) => println!("File saved!"),
-        Err(err) => println!("\nError while saving file: {}", err),
+        Err(err) => println!("Error while saving file: {}", err),
     }
 
     Ok(())
@@ -140,11 +140,11 @@ pub fn use_opensubs(files: clap::Values, lang: &str, token: &str) -> Result<()> 
     let files: Vec<&str> = files.collect();
     if files.len() > 0 {
         for file in files.iter() {
-            println!("\nGenerating hash for {}", file);
+            println!("Generating hash for {}", file);
             let hash = hash(*file)?;
-            println!("\nHash generated: {}", &hash);
+            println!("Hash generated: {}", &hash);
 
-            println!("\nSearching subtitles...");
+            println!("Searching subtitles...");
             let results = search_subtitles(*file, &hash)?;
             let filtered_results: Vec<&serde_json::Value> = results
                 .as_array()
@@ -154,7 +154,7 @@ pub fn use_opensubs(files: clap::Values, lang: &str, token: &str) -> Result<()> 
                 .collect();
 
             if filtered_results.len() > 0 {
-                println!("\nFound subtitle. Downloading...");
+                println!("Found subtitle. Downloading...");
                 let subtitle = filtered_results[0];
                 let file_id = subtitle["attributes"]["files"][0]["file_id"].to_string();
                 let link = get_subtitle_link(&file_id, token)?;
@@ -164,7 +164,7 @@ pub fn use_opensubs(files: clap::Values, lang: &str, token: &str) -> Result<()> 
 
                 download_subtitle(&link, &fname)?
             } else {
-                println!("\nCould not find suitable subtitle.");
+                println!("Could not find suitable subtitle.");
             }
         }
     }
