@@ -1,5 +1,6 @@
 use super::error::Result;
 use super::{authenticate_os_user, save_file};
+use colored::Colorize;
 use dialoguer::Confirm;
 use reqwest::{header::CONTENT_TYPE, Url};
 use std::{
@@ -27,7 +28,10 @@ pub fn get_user_info(token: &str) -> Result<serde_json::Value> {
 pub fn get_os_token(username: &str, password: &str) -> Result<String> {
     let token: String;
 
-    println!("Generating token using username & password...");
+    println!(
+        "{}",
+        "Generating token using username & password...".green()
+    );
 
     let client = reqwest::blocking::Client::builder().build()?;
 
@@ -45,13 +49,17 @@ pub fn get_os_token(username: &str, password: &str) -> Result<String> {
         .json()?;
 
     if response["status"] == 401 {
-        println!("Error: Unauthorized");
+        println!("{}", "[!] Error: Unauthorized.".red().bold());
         return Ok(String::new());
     }
 
     token = response["token"].to_string();
 
-    println!("Generated token for {}: {}", username, &token);
+    println!(
+        "{}: {}",
+        format!("Generated token for {}", username).bold().green(),
+        &token
+    );
 
     Ok(token)
 }
@@ -71,7 +79,7 @@ fn search_subtitles(fname: &str, hash: &str) -> Result<serde_json::Value> {
 }
 
 fn get_subtitle_link(file_id: &str, token: &str) -> Result<String> {
-    println!("Getting download link.");
+    println!("{}", "Getting download link.".green());
 
     let client = reqwest::blocking::Client::builder().build()?;
 
@@ -94,15 +102,15 @@ fn get_subtitle_link(file_id: &str, token: &str) -> Result<String> {
 }
 
 fn download_subtitle(link: &str, fname: &str) -> Result<()> {
-    println!("Download started. Link: {}", link);
+    println!("{}", "[!] Download started...".green().bold());
 
     let client = reqwest::blocking::Client::builder().build()?;
 
     let response = client.get(link).send()?.text()?;
 
     match save_file(&response, fname) {
-        Ok(_) => println!("File saved!"),
-        Err(err) => println!("Error while saving file: {}", err),
+        Ok(_) => println!("{}", "[!] File saved!".green().bold()),
+        Err(err) => println!("{} {}", "[!] Error while saving file:".red().bold(), err),
     }
 
     Ok(())
@@ -112,13 +120,21 @@ pub fn use_opensubs(files: clap::Values, lang: &str, token: &str) -> Result<()> 
     match get_user_info(token) {
         Ok(user_info) => {
             println!(
-                "{} downloads remaining.",
-                user_info["data"]["remaining_downloads"].to_string()
+                "{}",
+                format!(
+                    "[!] {} downloads remaining.",
+                    user_info["data"]["remaining_downloads"].to_string()
+                )
+                .green()
+                .bold()
             );
         }
         Err(_) => {
             if Confirm::new()
-                .with_prompt("Error loading user info. Do you want to reset your token?")
+                .with_prompt(format!(
+                    "{} Do you want to reset your token?",
+                    "[!] Error loading user info.".red().bold()
+                ))
                 .interact()?
             {
                 match authenticate_os_user() {
@@ -126,12 +142,17 @@ pub fn use_opensubs(files: clap::Values, lang: &str, token: &str) -> Result<()> 
                         use_opensubs(files.to_owned(), lang, token)?;
                     }
                     Err(err) => {
-                        println!("Error: {:#?}", err);
+                        println!("{} {:#?}", "[!] Error: ".red().bold(), err);
                         return Ok(());
                     }
                 }
             } else {
-                println!("Can't use OpenSubtitles API without valid token.");
+                println!(
+                    "{}",
+                    "[!] Can't use OpenSubtitles API without valid token."
+                        .red()
+                        .bold()
+                );
                 return Ok(());
             }
         }
@@ -140,11 +161,11 @@ pub fn use_opensubs(files: clap::Values, lang: &str, token: &str) -> Result<()> 
     let files: Vec<&str> = files.collect();
     if files.len() > 0 {
         for file in files.iter() {
-            println!("Generating hash for {}", file);
+            println!("{} {}", "Generating hash for".green(), file);
             let hash = hash(*file)?;
-            println!("Hash generated: {}", &hash);
+            println!("{} {}", "[!] Hash generated:".green().bold(), &hash);
 
-            println!("Searching subtitles...");
+            println!("{}", "Searching subtitles...".green());
             let results = search_subtitles(*file, &hash)?;
             let filtered_results: Vec<&serde_json::Value> = results
                 .as_array()
@@ -154,7 +175,7 @@ pub fn use_opensubs(files: clap::Values, lang: &str, token: &str) -> Result<()> 
                 .collect();
 
             if filtered_results.len() > 0 {
-                println!("Found subtitle. Downloading...");
+                println!("{} Downloading...", "[!] Found subtitle.".green().bold());
                 let subtitle = filtered_results[0];
                 let file_id = subtitle["attributes"]["files"][0]["file_id"].to_string();
                 let link = get_subtitle_link(&file_id, token)?;
@@ -164,7 +185,7 @@ pub fn use_opensubs(files: clap::Values, lang: &str, token: &str) -> Result<()> 
 
                 download_subtitle(&link, &fname)?
             } else {
-                println!("Could not find suitable subtitle.");
+                println!("{}", "[!] Could not find suitable subtitle.".red().bold());
             }
         }
     }

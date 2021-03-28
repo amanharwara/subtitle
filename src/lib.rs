@@ -4,6 +4,7 @@ mod opensubs;
 mod utils;
 
 use clap::ArgMatches;
+use colored::Colorize;
 use config::Config;
 use dialoguer::{Confirm, Input, Password};
 use error::{Error, Result};
@@ -20,20 +21,24 @@ pub fn run(matches: ArgMatches) -> Result<()> {
         current_lang = lang;
     }
 
-    println!("Current Language: {}", current_lang.to_uppercase());
+    println!(
+        "{} {}",
+        "Current Language:".green(),
+        current_lang.to_uppercase()
+    );
 
     match matches.values_of("file") {
         Some(files) => {
             if os_token.len() > 0 {
                 use_opensubs(files, current_lang, os_token)?
             } else {
-                println!("No OpenSubtitles token found.");
+                println!("{}", "[!] No OpenSubtitles token found.".red().bold());
                 authenticate_os_user()?;
                 use_opensubs(files, current_lang, os_token)?
             }
         }
         None => {
-            println!("No files provided.");
+            println!("{}", "[!] No files provided.".red().bold());
         }
     }
 
@@ -63,7 +68,7 @@ pub fn authenticate_os_user() -> Result<()> {
 }
 
 pub fn save_file(content: &str, filename: &str) -> Result<()> {
-    println!("Saving to {}", filename);
+    println!("{} {}", "Saving to".green(), filename.italic());
     fs::write(filename, content).map_err(|e| Error::IO(e))
 }
 
