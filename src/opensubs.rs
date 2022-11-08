@@ -14,7 +14,7 @@ const API_KEY: &str = "pmGQgkYQjVnEUBc05cApQs7cnfw3Mrdo";
 
 pub fn get_user_info(token: &str) -> Result<serde_json::Value> {
     let client = reqwest::blocking::Client::builder().build()?;
-    let url = "https://www.opensubtitles.com/api/v1/infos/user";
+    let url = "https://api.opensubtitles.com/api/v1/infos/user";
     let response: serde_json::Value = client
         .get(url)
         .header(CONTENT_TYPE, "application/json")
@@ -35,7 +35,7 @@ pub fn get_os_token(username: &str, password: &str) -> Result<String> {
 
     let client = reqwest::blocking::Client::builder().build()?;
 
-    let url = "https://www.opensubtitles.com/api/v1/login";
+    let url = "https://api.opensubtitles.com/api/v1/login";
 
     let response: serde_json::Value = client
         .post(url)
@@ -68,7 +68,7 @@ fn search_subtitles(fname: &str, hash: &str) -> Result<serde_json::Value> {
     let client = reqwest::blocking::Client::builder().build()?;
 
     let url = Url::parse_with_params(
-        "https://www.opensubtitles.com/api/v1/subtitles",
+        "https://api.opensubtitles.com/api/v1/subtitles",
         &[("query", fname), ("moviehash", hash)],
     )
     .unwrap();
@@ -83,7 +83,7 @@ fn get_subtitle_link(file_id: &str, token: &str) -> Result<String> {
 
     let client = reqwest::blocking::Client::builder().build()?;
 
-    let url = "https://www.opensubtitles.com/api/v1/download";
+    let url = "https://api.opensubtitles.com/api/v1/download";
 
     let response: serde_json::Value = client
         .post(url)
